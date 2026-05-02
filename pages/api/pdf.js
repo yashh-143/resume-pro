@@ -1,6 +1,7 @@
 import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 
+<<<<<<< HEAD
 export const config = {
   api: { responseLimit: "10mb" },
   // Required: tells Vercel to give this function more memory/time for PDF gen
@@ -58,5 +59,35 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to generate PDF" });
   } finally {
     if (browser) await browser.close();
+=======
+export default async function handler(req, res) {
+  try {
+    const { name, email } = req.body;
+
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    const page = await browser.newPage();
+
+    await page.setContent(`
+      <html>
+        <body>
+          <h1>${name}</h1>
+          <p>${email}</p>
+        </body>
+      </html>
+    `);
+
+    const pdf = await page.pdf({ format: "A4" });
+
+    await browser.close();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.status(200).send(pdf);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "PDF generation failed" });
+>>>>>>> 90cf117d0aa98c6d3fe56b60a795aa06c1dd3284
   }
 }
